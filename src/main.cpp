@@ -21,6 +21,7 @@ void printBox2D(const double* box){
 }
 void printCells(const MCAuto<DataArrayIdType> cellIdsArr){
   std::cout << "Number of cells = " << cellIdsArr->getNumberOfTuples() << std::endl;
+  std::cout << "Number of elements = " << cellIdsArr->getNbOfElems() << std::endl;
 }
 
 void printBox2D(const double* box, const MCAuto<DataArrayIdType> cellIdsArr){
@@ -36,15 +37,22 @@ void testMesh(){
   double coords[3*nbOfNodes];
   for (int i=0;i<nbOfNodes; i++){
     coords[0+3*i]=i;
-    coords[1+3*i]=i;
+    coords[1+3*i]=0;
     coords[2+3*i]=0;
   }
-  mcIdType tab[2*nbOfCells]={0,1,1,2,2,3};
+  mcIdType *tab = new mcIdType(2*nbOfCells);
+  for (int i=0; i<nbOfCells; i+=2){
+    tab[i  ] = i;
+    tab[i+1] = i+1;
+  }
+  //  mcIdType tab[2*nbOfCells]={0,1,1,2,2,3};
   MEDCouplingUMesh *mesh=MEDCouplingUMesh::New("M1D",1);
   mesh->allocateCells(nbOfCells);
-  mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+0);
-  mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+2);
-  mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+4);
+  for (int i=0; i<nbOfCells; i+=2){
+    mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+i);
+  }
+ // mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+2);
+  //mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,tab+4);
   mesh->finishInsertingCells();
   mesh->getNodalConnectivity()->getNbOfElems();
   mesh->getNumberOfCells();
